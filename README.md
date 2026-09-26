@@ -1,37 +1,67 @@
 # NoteForge
 
-An AI-powered learning tool that transforms raw study notes into interactive quizzes, in-depth concept explanations, and personalized revision content.
+NoteForge is a production-style local MVP for AI-assisted study workflows. It converts notes into deterministic mock-AI quizzes, concept explanations, and personalized revision actions without requiring external API keys.
 
----
+## Features
 
-## ✨ Key Features
+- **Dashboard & landing**: study snapshot, streak, due revisions, quick actions, and recent activity.
+- **Notes workflow**: searchable/filterable note list, detail view, create/edit form, tags, difficulty, subject, and word count.
+- **Learning workflow**: generate quizzes from notes with multiple-choice, true/false, and short-answer questions; submit answers with scoring and explanations.
+- **Concept explanations**: select concepts from a note and receive layered output (simple, detailed, analogy, takeaways) with loading/error states.
+- **Personalized revision**: confidence-based revision queue with due items and completion actions.
+- **Analytics**: streak, average score, mastery by subject, and recent quiz performance.
 
-- **Interactive Quiz Generation**: Automatically extracts key concepts from notes to generate multiple-choice, fill-in-the-blank, and short-answer quizzes.
-- **Deep Concept Breakdown**: Simplifies complex topics and terminology into digestible, structured explanations.
-- **Personalized Revision Summaries**: Generates quick-read cheat sheets, flashcards, and high-yield review content tailored to your study materials.
-- **Multi-Format Input**: Process notes from plain text, Markdown, or uploaded document files.
+## Tech Stack
 
----
+- **Frontend**: React + TypeScript + Vite
+- **State Management**: React context provider with typed domain actions
+- **Data Layer**: in-memory repository/service modules with seed demo data
+- **AI Abstraction**: deterministic `MockAIProvider` behind an `AIProvider` interface seam
+- **Testing**: Vitest + Testing Library
 
-## 🛠️ Tech Stack
+## Project Structure
 
-- **Frontend / Framework**: Next.js (React), TypeScript, Tailwind CSS
-- **AI Integration**: Google Gemini API / OpenAI API
-- **State & UI**: Lucide Icons, Shadcn UI / Radix Primitives
+```text
+src/
+  components/
+    analytics/
+    concepts/
+    dashboard/
+    layout/
+    learning/
+    notes/
+    primitives/
+    revision/
+  data/               # seed demo data
+  repositories/       # in-memory note repository
+  services/           # quiz/revision/dashboard + AI provider
+  state/              # app-wide state context
+  types/              # strict domain models
+  utils/              # validation, analytics, text/date helpers
+  test/               # test setup
+```
 
----
+## Scripts
 
-## 🚀 Quick Start
+```bash
+npm install
+npm run dev        # start local app
+npm run lint       # lint with oxlint
+npm run typecheck  # strict TypeScript checks
+npm run test       # run unit/component tests
+npm run build      # production build
+```
 
-### Prerequisites
+## Architecture Notes
 
-- Node.js (v18.x or higher)
-- npm, pnpm, or yarn
-- An API Key (Gemini or OpenAI)
+- Domain entities are explicitly typed (`Note`, `Quiz`, `QuizQuestion`, `QuizAttempt`, `RevisionItem`, `DashboardStats`, etc.).
+- Components are split by product workflow and use shared UI primitives for consistency/accessibility.
+- Form input is validated before note creation/update via `validateNoteInput`.
+- Data access is routed through repository/services so a real API/database can replace the in-memory layer later.
+- Mock AI outputs are deterministic, enabling stable local demos and tests.
 
-### Installation
+## Future Integration Points
 
-1. **Clone the repository:**
-   ```bash
-   git clone [https://github.com/lakshyakurup/NoteForge.git](https://github.com/lakshyakurup/NoteForge.git)
-   cd NoteForge
+- Swap `MockAIProvider` with OpenAI/Gemini-backed provider implementation.
+- Replace in-memory repositories with persistence (e.g., REST API + database).
+- Add authentication and collaborative note sharing when needed.
