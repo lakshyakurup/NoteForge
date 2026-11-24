@@ -22,7 +22,29 @@ export type RevisionPack = {
   highYield: string[];
 };
 
-const systemPrompt = `You are NoteForge, an expert AI tutor. 
+export type SummaryResult = {
+  title: string;
+  summary: string;
+  bullets: string[];
+  keywords: string[];
+};
+
+export type ExplainResult = {
+  term: string;
+  definition: string;
+  simple: string;
+  example: string;
+  related: string[];
+};
+
+export type StudyPlanResult = {
+  title: string;
+  totalMinutes: number;
+  sessions: { day: string; focus: string; minutes: number; tasks: string[] }[];
+  tips: string[];
+};
+
+const systemPrompt = `You are NoteForge, an expert AI tutor.
 You turn raw study notes into clear, accurate learning materials.
 Always respond with valid JSON only. No markdown fences.`;
 
@@ -35,7 +57,6 @@ function getProvider() {
   throw new Error("No AI API key found. Set GEMINI_API_KEY or OPENAI_API_KEY.");
 }
 
-/** Strip optional ```json fences Gemini sometimes returns */
 function cleanJson(raw: string): string {
   let text = raw.trim();
   if (text.startsWith("```")) {
@@ -53,12 +74,10 @@ async function callAI(prompt: string): Promise<string> {
       model: "gemini-1.5-flash",
       systemInstruction: systemPrompt,
     });
-    // Pass a plain string — correct for this SDK version
-    const result = await model.generateContent(`${prompt}`);
+    const result = await model.generateContent(prompt);
     return cleanJson(result.response.text());
   }
 
-  // OpenAI
   const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
   const completion = await openai.chat.completions.create({
     model: "gpt-4o-mini",
@@ -75,62 +94,56 @@ export async function generateQuiz(notes: string, count = 8): Promise<QuizQuesti
   const prompt = `From the following study notes, generate exactly ${count} quiz questions.
 Mix of multiple-choice (mcq), fill-in-the-blank (fill), and short-answer (short).
 
-Return JSON in this exact shape:
-{
-  "questions": [
-    {
-      "type": "mcq" | "fill" | "short",
-      "question": "string",
-      "options": ["A", "B", "C", "D"],
-      "answer": "string",
-      "explanation": "short explanation"
-    }
-  ]
-}
+Return JSON:
+{"questions":[{"type":"mcq"|"fill"|"short","question":"string","options":["A","B","C","D"],"answer":"string","explanation":"short"}]}
 
 Notes:\n${notes}`;
-
-  const raw = await callAI(prompt);
-  const parsed = JSON.parse(raw);
+  const parsed = JSON.parse(await callAI(prompt));
   return parsed.questions ?? [];
 }
 
 export async function generateConceptBreakdown(notes: string): Promise<ConceptBreakdown[]> {
-  const prompt = `Break down the key concepts from these notes into clear, structured explanations.
-
+  const prompt = `Break down key concepts from these notes.
 Return JSON:
-{
-  "concepts": [
-    {
-      "title": "Concept name",
-      "summary": "2-3 sentence explanation",
-      "keyPoints": ["point 1", "point 2"],
-      "analogies": ["optional analogy"]
-    }
-  ]
-}
+{"concepts":[{"title":"","summary":"","keyPoints":[],"analogies":[]}]}
 
 Notes:\n${notes}`;
-
-  const raw = await callAI(prompt);
-  const parsed = JSON.parse(raw);
+  const parsed = JSON.parse(await callAI(prompt));
   return parsed.concepts ?? [];
 }
 
 export async function generateRevisionPack(notes: string): Promise<RevisionPack> {
-  const prompt = `Create a high-yield revision pack from these notes.
-
+  const prompt = `Create a high-yield revision pack.
 Return JSON:
-{
-  "cheatSheet": "concise markdown-style summary",
-  "flashcards": [
-    { "front": "term or question", "back": "definition or answer" }
-  ],
-  "highYield": ["must-know fact 1", "must-know fact 2"]
-}
+{"cheatSheet":"","flashcards":[{"front":"","back":""}],"highYield":[]}
 
 Notes:\n${notes}`;
+  return JSON.parse(await callAI(prompt));
+}
 
-  const raw = await callAI(prompt);
-  return JSON.parse(raw);
+export async function generateSummary(notes: string): Promise<SummaryResult> {
+  const prompt = `Summarize these study notes for fast review.
+Return JSON:
+{"title":"","summary":"2-4 sentence overview","bullets":["key point"],"keywords":["term"]}
+
+Notes:\n${notes}`;
+  return JSON.parse(await callAI(prompt));
+}
+
+export async function explainTerm(notes: string, term: string): Promise<ExplainResult> {
+  const prompt = `Explain the term "${term}" in the context of these notes.
+Return JSON:
+{"term":"${term}","definition":"precise","simple":"ELI5","example":"concrete example","related":["related term"]}
+
+Notes:\n${notes}`;
+  return JSON.parse(await callAI(prompt));
+}
+
+export async function generateStudyPlan(notes: string, days = 5): Promise<StudyPlanResult> {
+  const prompt = `Create a ${days}-day study plan from these notes.
+Return JSON:
+{"title":"","totalMinutes":0,"sessions":[{"day":"Day 1","focus":"","minutes":30,"tasks":[]}],"tips":[]}
+
+Notes:\n${notes}`;
+  return JSON.parse(await callAI(prompt));
 }

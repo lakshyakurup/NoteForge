@@ -1,4 +1,11 @@
-import type { QuizQuestion, ConceptBreakdown, RevisionPack } from "@/types";
+import type {
+  QuizQuestion,
+  ConceptBreakdown,
+  RevisionPack,
+  SummaryResult,
+  ExplainResult,
+  StudyPlanResult,
+} from "@/lib/ai";
 
 export const DEMO_NOTES = `Photosynthesis is the process by which green plants convert light energy into chemical energy.
 Chlorophyll absorbs light mainly in the blue and red wavelengths.
@@ -9,61 +16,50 @@ Equation: 6CO2 + 6H2O + light → C6H12O6 + 6O2.`;
 export const DEMO_QUIZ: QuizQuestion[] = [
   {
     type: "mcq",
-    question: "Where do the light-dependent reactions of photosynthesis take place?",
-    options: [
-      "Stroma",
-      "Thylakoid membrane",
-      "Cytoplasm",
-      "Mitochondrial matrix",
-    ],
+    question: "Where do the light-dependent reactions take place?",
+    options: ["Stroma", "Thylakoid membrane", "Cytoplasm", "Nucleus"],
     answer: "Thylakoid membrane",
-    explanation: "Photosystems are embedded in the thylakoid membrane.",
+    explanation: "Photosystems sit in the thylakoid membrane.",
   },
   {
     type: "mcq",
-    question: "Which pigment primarily absorbs blue and red light?",
-    options: ["Carotene", "Xanthophyll", "Chlorophyll", "Anthocyanin"],
+    question: "Primary pigment absorbing blue and red light?",
+    options: ["Carotene", "Xanthophyll", "Chlorophyll", "Melanin"],
     answer: "Chlorophyll",
-    explanation: "Chlorophyll a/b peak in blue and red regions.",
+    explanation: "Chlorophyll a/b peak in blue and red.",
   },
   {
     type: "fill",
     question: "The Calvin cycle fixes ___ into sugars.",
     answer: "CO2",
-    explanation: "Carbon fixation is the first stage of the Calvin cycle.",
+    explanation: "Carbon fixation step.",
   },
   {
     type: "short",
-    question: "Name the two high-energy products of the light reactions used by the Calvin cycle.",
+    question: "Name two products of the light reactions used by the Calvin cycle.",
     answer: "ATP and NADPH",
-    explanation: "Both are required for carbon reduction.",
+    explanation: "Energy and reducing power.",
   },
 ];
 
 export const DEMO_CONCEPTS: ConceptBreakdown[] = [
   {
     title: "Light-dependent reactions",
-    summary:
-      "Capture photons to split water, release oxygen, and generate ATP and NADPH.",
-    keyPoints: [
-      "Occur in thylakoid membranes",
-      "Involve Photosystem II and I",
-      "Produce O2 as a byproduct",
-    ],
-    analogies: ["Like a solar panel charging batteries (ATP/NADPH)"],
+    summary: "Capture photons, split water, make ATP and NADPH, release O2.",
+    keyPoints: ["Thylakoid membrane", "Photosystem II & I", "O2 byproduct"],
+    analogies: ["Solar panel charging batteries"],
   },
   {
     title: "Calvin cycle",
-    summary:
-      "Uses ATP and NADPH to fix atmospheric CO2 into carbohydrates in the stroma.",
-    keyPoints: ["Carbon fixation", "Reduction", "Regeneration of RuBP"],
-    analogies: ["Like a factory assembling sugar from carbon parts"],
+    summary: "Uses ATP/NADPH to fix CO2 into carbs in the stroma.",
+    keyPoints: ["Carbon fixation", "Reduction", "RuBP regeneration"],
+    analogies: ["Factory assembling sugar"],
   },
 ];
 
 export const DEMO_REVISION: RevisionPack = {
   cheatSheet:
-    "Photosynthesis = light reactions (thylakoid) + Calvin cycle (stroma).\nKey equation: 6CO2 + 6H2O → C6H12O6 + 6O2\nProducts of light stage: ATP, NADPH, O2",
+    "Light reactions (thylakoid) → ATP + NADPH + O2\nCalvin cycle (stroma) → glucose from CO2\n6CO2 + 6H2O → C6H12O6 + 6O2",
   flashcards: [
     { front: "Thylakoid", back: "Site of light-dependent reactions" },
     { front: "Stroma", back: "Site of Calvin cycle" },
@@ -77,8 +73,79 @@ export const DEMO_REVISION: RevisionPack = {
   ],
 };
 
-export function getDemoResult(mode: "quiz" | "concepts" | "revision") {
-  if (mode === "quiz") return { questions: DEMO_QUIZ };
-  if (mode === "concepts") return { concepts: DEMO_CONCEPTS };
-  return DEMO_REVISION;
+export const DEMO_SUMMARY: SummaryResult = {
+  title: "Photosynthesis overview",
+  summary:
+    "Plants convert light into chemical energy. Light reactions in thylakoids make ATP/NADPH; the Calvin cycle in the stroma builds glucose from CO2.",
+  bullets: [
+    "Light stage in thylakoid membrane",
+    "Dark stage (Calvin) in stroma",
+    "Chlorophyll is the main pigment",
+  ],
+  keywords: ["chlorophyll", "thylakoid", "Calvin cycle", "ATP", "NADPH"],
+};
+
+export const DEMO_EXPLAIN: ExplainResult = {
+  term: "Calvin cycle",
+  definition: "Set of light-independent reactions that fix CO2 into carbohydrates.",
+  simple: "The sugar factory that runs on ATP and NADPH made by light reactions.",
+  example: "In daytime, stomata let CO2 in; the Calvin cycle turns it into glucose.",
+  related: ["RuBP", "stroma", "carbon fixation"],
+};
+
+export const DEMO_PLAN: StudyPlanResult = {
+  title: "5-day Photosynthesis sprint",
+  totalMinutes: 150,
+  sessions: [
+    {
+      day: "Day 1",
+      focus: "Big picture",
+      minutes: 30,
+      tasks: ["Read equation", "Sketch chloroplast", "List inputs/outputs"],
+    },
+    {
+      day: "Day 2",
+      focus: "Light reactions",
+      minutes: 30,
+      tasks: ["Memorize thylakoid steps", "Flashcards: ATP/NADPH"],
+    },
+    {
+      day: "Day 3",
+      focus: "Calvin cycle",
+      minutes: 30,
+      tasks: ["Map fixation → reduction → regeneration"],
+    },
+    {
+      day: "Day 4",
+      focus: "Practice quiz",
+      minutes: 30,
+      tasks: ["Complete 8 questions", "Review misses"],
+    },
+    {
+      day: "Day 5",
+      focus: "Synthesis",
+      minutes: 30,
+      tasks: ["Teach aloud", "One-page cheat sheet"],
+    },
+  ],
+  tips: ["Active recall beats re-reading", "Space sessions across days"],
+};
+
+export function getDemoResult(mode: string, term?: string) {
+  switch (mode) {
+    case "quiz":
+      return { questions: DEMO_QUIZ };
+    case "concepts":
+      return { concepts: DEMO_CONCEPTS };
+    case "revision":
+      return DEMO_REVISION;
+    case "summary":
+      return DEMO_SUMMARY;
+    case "explain":
+      return { ...DEMO_EXPLAIN, term: term || DEMO_EXPLAIN.term };
+    case "plan":
+      return DEMO_PLAN;
+    default:
+      return { questions: DEMO_QUIZ };
+  }
 }
