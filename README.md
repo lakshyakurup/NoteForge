@@ -6,18 +6,21 @@ An AI-powered learning tool that transforms raw study notes into interactive qui
 
 ## ✨ Key Features
 
-- **Interactive Quiz Generation**: Automatically extracts key concepts from notes to generate multiple-choice, fill-in-the-blank, and short-answer quizzes.
-- **Deep Concept Breakdown**: Simplifies complex topics and terminology into digestible, structured explanations.
-- **Personalized Revision Summaries**: Generates quick-read cheat sheets, flashcards, and high-yield review content tailored to your study materials.
-- **Multi-Format Input**: Process notes from plain text, Markdown, or uploaded document files.
+- **Interactive Quiz Generation**: Multiple-choice, fill-in-the-blank, and short-answer questions with **live answering + scoring**.
+- **Deep Concept Breakdown**: Structured explanations with key points and analogies.
+- **Personalized Revision Packs**: Cheat sheets, **flip-style flashcards**, and high-yield points.
+- **Multi-Format Input**: Paste text **or upload** `.txt`, `.md`, or **PDF** files.
+- **Dark / Light theme** toggle.
+- **Local Auth + History**: Simple browser profile and saved generation history (localStorage).
 
 ---
 
 ## 🛠️ Tech Stack
 
-- **Frontend / Framework**: Next.js 15 (React 19), TypeScript, Tailwind CSS
-- **AI Integration**: Google Gemini API / OpenAI API (switchable)
-- **State & UI**: Lucide Icons, custom Shadcn-style components
+- **Frontend**: Next.js 15 (React 19), TypeScript, Tailwind CSS, next-themes
+- **AI**: Google Gemini API / OpenAI API (switchable)
+- **PDF**: pdfjs-dist (client-side text extraction)
+- **UI**: Lucide Icons, custom Shadcn-style components
 
 ---
 
@@ -25,60 +28,57 @@ An AI-powered learning tool that transforms raw study notes into interactive qui
 
 ### Prerequisites
 
-- Node.js (v18.x or higher)
-- npm, pnpm, or yarn
-- An API Key (Gemini **or** OpenAI)
+- Node.js 18+
+- npm / pnpm / yarn
+- Gemini **or** OpenAI API key
 
 ### Installation
 
-1. **Clone the repository:**
-   ```bash
-   git clone https://github.com/lakshyakurup/NoteForge.git
-   cd NoteForge
-   ```
+```bash
+git clone https://github.com/lakshyakurup/NoteForge.git
+cd NoteForge
+npm install
+cp .env.example .env.local
+```
 
-2. **Install dependencies:**
-   ```bash
-   npm install
-   ```
+Edit `.env.local`:
 
-3. **Set up environment variables:**
-   ```bash
-   cp .env.example .env.local
-   ```
-   Then edit `.env.local` and add at least one API key:
-   ```env
-   GEMINI_API_KEY=your_gemini_key_here
-   # or
-   OPENAI_API_KEY=your_openai_key_here
-   ```
+```env
+GEMINI_API_KEY=your_key_here
+# or
+OPENAI_API_KEY=your_key_here
+```
 
-4. **Run the development server:**
-   ```bash
-   npm run dev
-   ```
+```bash
+npm run dev
+```
 
-5. Open [http://localhost:3000](http://localhost:3000) in your browser.
+Open [http://localhost:3000](http://localhost:3000).
 
 ---
 
 ## 📁 Project Structure
 
 ```
-NoteForge/
-├── src/
-│   ├── app/
-│   │   ├── api/generate/route.ts   # AI generation endpoint
-│   │   ├── globals.css
-│   │   ├── layout.tsx
-│   │   └── page.tsx                # Main UI
-│   ├── components/ui/              # Button, Card, Textarea
-│   └── lib/
-│       ├── ai.ts                   # Gemini + OpenAI wrappers
-│       └── utils.ts
-├── .env.example
-├── package.json
-└── tailwind.config.ts
+src/
+├── app/
+│   ├── api/generate/route.ts
+│   ├── globals.css
+│   ├── layout.tsx
+│   └── page.tsx
+├── components/
+│   ├── ui/                  # Button, Card, Textarea
+│   ├── auth-dialog.tsx
+│   ├── file-upload.tsx
+│   ├── flashcard.tsx
+│   ├── history-panel.tsx
+│   ├── quiz-player.tsx
+│   ├── theme-provider.tsx
+│   └── theme-toggle.tsx
+└── lib/
+    ├── ai.ts
+    ├── history.ts           # localStorage auth + history
+    └── utils.ts
 ```
 
 ---
@@ -90,7 +90,7 @@ NoteForge/
 | Google Gemini | [aistudio.google.com](https://aistudio.google.com/app/apikey) |
 | OpenAI | [platform.openai.com](https://platform.openai.com/api-keys) |
 
-Set `AI_PROVIDER=gemini` or `AI_PROVIDER=openai` in `.env.local` to force a provider.
+Set `AI_PROVIDER=gemini` or `openai` to force a provider.
 
 ---
 
