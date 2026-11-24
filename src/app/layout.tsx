@@ -6,19 +6,17 @@ import { ThemeProvider } from "@/components/theme-provider";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "NoteForge — AI Study Companion",
+  title: "NoteForge — Neural Study OS",
   description:
-    "Transform raw study notes into interactive quizzes, concept breakdowns, and personalized revision packs.",
+    "High-tech AI workspace: quizzes, concepts, revision packs, summaries, explain, and study plans.",
 };
 
 export default function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+}: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${inter.className} antialiased min-h-screen`}>
+      <body className={`${inter.className} min-h-screen`}>
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
           {children}
         </ThemeProvider>
