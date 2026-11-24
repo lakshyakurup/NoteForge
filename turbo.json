@@ -1,0 +1,25 @@
+{
+  "$schema": "https://turbo.build/schema.json",
+  "tasks": {
+    "lint": {
+      "tags": ["ci"],
+      "outputs": []
+    },
+    "typecheck": {
+      "tags": ["ci"],
+      "outputs": []
+    },
+    "test": {
+      "tags": ["ci"],
+      "outputs": ["coverage/**"]
+    },
+    "build": {
+      "dependsOn": ["^build"],
+      "outputs": [".next/**", "!.next/cache/**"]
+    },
+    "dev": {
+      "cache": false,
+      "persistent": true
+    }
+  }
+}

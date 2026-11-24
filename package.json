@@ -14,7 +14,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "format": "prettier --write .",
-    "prepare:demo": "node scripts/seed-demo.mjs"
+    "prepare:demo": "node scripts/seed-demo.mjs",
+    "ci": "turbo run lint typecheck test"
   },
   "dependencies": {
     "@google/generative-ai": "^0.21.0",
@@ -40,7 +41,9 @@
     "postcss": "^8.4.49",
     "prettier": "^3.4.2",
     "tailwindcss": "^3.4.17",
+    "turbo": "^2.5.4",
     "typescript": "^5.7.2",
     "vitest": "^2.1.8"
-  }
+  },
+  "packageManager": "npm@10.9.0"
 }
