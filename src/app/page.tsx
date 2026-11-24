@@ -27,6 +27,8 @@ import { QuizPlayer } from "@/components/quiz-player";
 import { Flashcard } from "@/components/flashcard";
 import { HistoryPanel } from "@/components/history-panel";
 import { AuthDialog } from "@/components/auth-dialog";
+import { DemoBanner } from "@/components/demo-banner";
+import { LoadingState } from "@/components/loading-state";
 import {
   getUser,
   saveToHistory,
@@ -36,10 +38,13 @@ import {
   exportConceptsPdf,
   exportRevisionPdf,
 } from "@/lib/export-pdf";
+import { DEMO_NOTES } from "@/lib/demo-data";
+import { t } from "@/lib/i18n";
 
 type Mode = "quiz" | "concepts" | "revision" | null;
 
 export default function HomePage() {
+  const copy = t("en");
   const [notes, setNotes] = useState("");
   const [mode, setMode] = useState<Mode>(null);
   const [loading, setLoading] = useState(false);
@@ -55,7 +60,7 @@ export default function HomePage() {
 
   async function handleGenerate(selected: Mode) {
     if (!notes.trim()) {
-      setError("Paste or upload some study notes first.");
+      setError(copy.emptyNotes);
       return;
     }
     setMode(selected);
@@ -78,7 +83,6 @@ export default function HomePage() {
       const data = await res.json();
       setResult(data);
 
-      // Save full notes + result to local history
       const title =
         selected === "quiz"
           ? `Quiz · ${data.questions?.length ?? 0} questions`
@@ -100,7 +104,6 @@ export default function HomePage() {
   }
 
   function loadFromHistory(entry: HistoryEntry) {
-    // Restore full notes when available (new entries); fall back to preview for old ones
     setNotes(entry.notes || entry.notesPreview || "");
     setMode(entry.mode);
     setResult(entry.result);
@@ -114,12 +117,17 @@ export default function HomePage() {
     } else if (mode === "revision") {
       exportRevisionPdf(result);
     }
-    // quiz export lives inside QuizPlayer
+  }
+
+  function loadDemoNotes() {
+    setNotes(DEMO_NOTES);
+    setError(null);
   }
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
+      <DemoBanner />
+
       <header className="border-b bg-background/80 backdrop-blur-sm sticky top-0 z-10">
         <div className="max-w-5xl mx-auto px-4 py-3 flex items-center justify-between gap-3">
           <div className="flex items-center gap-3">
@@ -127,9 +135,9 @@ export default function HomePage() {
               <Sparkles className="h-5 w-5 text-white" />
             </div>
             <div>
-              <h1 className="text-lg font-bold tracking-tight">NoteForge</h1>
+              <h1 className="text-lg font-bold tracking-tight">{copy.appName}</h1>
               <p className="text-xs text-muted-foreground hidden sm:block">
-                AI-powered study companion
+                {copy.tagline}
               </p>
             </div>
           </div>
@@ -142,7 +150,7 @@ export default function HomePage() {
               onClick={() => setHistoryOpen(true)}
             >
               <History className="h-4 w-4" />
-              <span className="hidden sm:inline">History</span>
+              <span className="hidden sm:inline">{copy.history}</span>
             </Button>
             <Button
               variant="ghost"
@@ -152,7 +160,7 @@ export default function HomePage() {
             >
               <User className="h-4 w-4" />
               <span className="hidden sm:inline max-w-[80px] truncate">
-                {user?.name ?? "Sign in"}
+                {user?.name ?? copy.signIn}
               </span>
             </Button>
             <ThemeToggle />
@@ -161,35 +169,35 @@ export default function HomePage() {
       </header>
 
       <main className="max-w-5xl mx-auto px-4 py-8 space-y-8">
-        {/* Hero */}
         <section className="text-center space-y-2">
           <h2 className="text-3xl sm:text-4xl font-bold tracking-tight">
-            Turn notes into mastery
+            {copy.heroTitle}
           </h2>
           <p className="text-muted-foreground max-w-xl mx-auto text-sm sm:text-base">
-            Upload a PDF or Markdown file, or paste notes — then generate
-            interactive quizzes, concept breakdowns, and revision packs.
+            {copy.heroSubtitle}
           </p>
         </section>
 
-        {/* Input */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-xl">
               <FileText className="h-5 w-5 text-indigo-500" />
-              Your Notes
+              {copy.notesTitle}
             </CardTitle>
-            <CardDescription>
-              Paste text or upload a .txt / .md / .pdf file.
-            </CardDescription>
+            <CardDescription>{copy.notesHint}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            <FileUpload
-              onTextExtracted={(text) => {
-                setNotes(text);
-                setError(null);
-              }}
-            />
+            <div className="flex flex-wrap items-center gap-2">
+              <FileUpload
+                onTextExtracted={(text) => {
+                  setNotes(text);
+                  setError(null);
+                }}
+              />
+              <Button type="button" variant="ghost" size="sm" onClick={loadDemoNotes}>
+                Load sample notes
+              </Button>
+            </div>
 
             <Textarea
               placeholder="Paste your lecture notes, textbook excerpts, or study material here..."
@@ -209,7 +217,7 @@ export default function HomePage() {
                 ) : (
                   <Brain className="h-4 w-4" />
                 )}
-                Generate Quiz
+                {copy.generateQuiz}
               </Button>
 
               <Button
@@ -222,7 +230,7 @@ export default function HomePage() {
                 ) : (
                   <Layers className="h-4 w-4" />
                 )}
-                Concept Breakdown
+                {copy.generateConcepts}
               </Button>
 
               <Button
@@ -235,7 +243,7 @@ export default function HomePage() {
                 ) : (
                   <BookOpen className="h-4 w-4" />
                 )}
-                Revision Pack
+                {copy.generateRevision}
               </Button>
             </div>
 
@@ -247,8 +255,18 @@ export default function HomePage() {
           </CardContent>
         </Card>
 
-        {/* Results */}
-        {result && (
+        {loading && (
+          <Card>
+            <CardHeader>
+              <CardTitle>Generating…</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <LoadingState />
+            </CardContent>
+          </Card>
+        )}
+
+        {result && !loading && (
           <Card>
             <CardHeader className="flex flex-row items-start justify-between gap-4 space-y-0">
               <CardTitle className="capitalize">
@@ -264,7 +282,7 @@ export default function HomePage() {
                   onClick={handleExport}
                 >
                   <Download className="h-3.5 w-3.5" />
-                  Export PDF
+                  {copy.exportPdf}
                 </Button>
               )}
             </CardHeader>
