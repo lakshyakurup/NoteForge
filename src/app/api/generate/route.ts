@@ -4,24 +4,26 @@ import {
   generateConceptBreakdown,
   generateRevisionPack,
 } from "@/lib/ai";
+import { generateBodySchema } from "@/lib/schemas";
+import { getDemoResult } from "@/lib/demo-data";
 
 export async function POST(req: NextRequest) {
   try {
-    const body = await req.json();
-    const { notes, mode } = body;
+    const json = await req.json();
+    const parsed = generateBodySchema.safeParse(json);
 
-    if (!notes || typeof notes !== "string") {
+    if (!parsed.success) {
       return NextResponse.json(
-        { error: "Notes are required" },
+        { error: parsed.error.flatten().formErrors.join(", ") || "Invalid body" },
         { status: 400 }
       );
     }
 
-    if (!mode || !["quiz", "concepts", "revision"].includes(mode)) {
-      return NextResponse.json(
-        { error: "Invalid mode. Use quiz | concepts | revision" },
-        { status: 400 }
-      );
+    const { notes, mode } = parsed.data;
+
+    // Demo mode: no external AI calls
+    if (process.env.NEXT_PUBLIC_DEMO_MODE === "true") {
+      return NextResponse.json(getDemoResult(mode));
     }
 
     let data;
@@ -35,11 +37,9 @@ export async function POST(req: NextRequest) {
     }
 
     return NextResponse.json(data);
-  } catch (err: any) {
-    console.error("[NoteForge API]", err);
-    return NextResponse.json(
-      { error: err.message || "Failed to generate content" },
-      { status: 500 }
-    );
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : "Failed to generate content";
+    console.error("[NoteForge API]", message);
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }

@@ -1,0 +1,3 @@
+# Optional — clean_notes.py is stdlib-only
+# Add NLP libs here later if needed:
+# nltk>=3.8
