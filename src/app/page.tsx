@@ -19,6 +19,7 @@ import {
   Layers,
   History,
   User,
+  Download,
 } from "lucide-react";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { FileUpload } from "@/components/file-upload";
@@ -31,6 +32,10 @@ import {
   saveToHistory,
   type HistoryEntry,
 } from "@/lib/history";
+import {
+  exportConceptsPdf,
+  exportRevisionPdf,
+} from "@/lib/export-pdf";
 
 type Mode = "quiz" | "concepts" | "revision" | null;
 
@@ -73,7 +78,7 @@ export default function HomePage() {
       const data = await res.json();
       setResult(data);
 
-      // Save to local history
+      // Save full notes + result to local history
       const title =
         selected === "quiz"
           ? `Quiz · ${data.questions?.length ?? 0} questions`
@@ -84,7 +89,7 @@ export default function HomePage() {
       saveToHistory({
         title,
         mode: selected!,
-        notesPreview: notes.slice(0, 120),
+        notes,
         result: data,
       });
     } catch (err: any) {
@@ -95,10 +100,21 @@ export default function HomePage() {
   }
 
   function loadFromHistory(entry: HistoryEntry) {
-    setNotes(entry.notesPreview); // preview only; full notes not stored to save space
+    // Restore full notes when available (new entries); fall back to preview for old ones
+    setNotes(entry.notes || entry.notesPreview || "");
     setMode(entry.mode);
     setResult(entry.result);
     setError(null);
+  }
+
+  function handleExport() {
+    if (!result || !mode) return;
+    if (mode === "concepts" && result.concepts) {
+      exportConceptsPdf(result.concepts);
+    } else if (mode === "revision") {
+      exportRevisionPdf(result);
+    }
+    // quiz export lives inside QuizPlayer
   }
 
   return (
@@ -234,12 +250,23 @@ export default function HomePage() {
         {/* Results */}
         {result && (
           <Card>
-            <CardHeader>
+            <CardHeader className="flex flex-row items-start justify-between gap-4 space-y-0">
               <CardTitle className="capitalize">
                 {mode === "quiz" && "Interactive Quiz"}
                 {mode === "concepts" && "Concept Breakdown"}
                 {mode === "revision" && "Revision Pack"}
               </CardTitle>
+              {(mode === "concepts" || mode === "revision") && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="gap-1.5 shrink-0"
+                  onClick={handleExport}
+                >
+                  <Download className="h-3.5 w-3.5" />
+                  Export PDF
+                </Button>
+              )}
             </CardHeader>
             <CardContent className="space-y-6">
               {mode === "quiz" && result.questions && (

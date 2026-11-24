@@ -35,16 +35,27 @@ function getProvider() {
   throw new Error("No AI API key found. Set GEMINI_API_KEY or OPENAI_API_KEY.");
 }
 
+/** Strip optional ```json fences Gemini sometimes returns */
+function cleanJson(raw: string): string {
+  let text = raw.trim();
+  if (text.startsWith("```")) {
+    text = text.replace(/^```(?:json)?\s*/i, "").replace(/\s*```$/, "");
+  }
+  return text.trim();
+}
+
 async function callAI(prompt: string): Promise<string> {
   const provider = getProvider();
 
   if (provider === "gemini") {
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-    const result = await model.generateContent([
-      { role: "user", parts: [{ text: `${systemPrompt}\n\n${prompt}` }] },
-    ]);
-    return result.response.text();
+    const model = genAI.getGenerativeModel({
+      model: "gemini-1.5-flash",
+      systemInstruction: systemPrompt,
+    });
+    // Pass a plain string — correct for this SDK version
+    const result = await model.generateContent(`${prompt}`);
+    return cleanJson(result.response.text());
   }
 
   // OpenAI
@@ -57,7 +68,7 @@ async function callAI(prompt: string): Promise<string> {
     ],
     response_format: { type: "json_object" },
   });
-  return completion.choices[0]?.message?.content ?? "{}";
+  return cleanJson(completion.choices[0]?.message?.content ?? "{}");
 }
 
 export async function generateQuiz(notes: string, count = 8): Promise<QuizQuestion[]> {
@@ -70,7 +81,7 @@ Return JSON in this exact shape:
     {
       "type": "mcq" | "fill" | "short",
       "question": "string",
-      "options": ["A", "B", "C", "D"]  // only for mcq
+      "options": ["A", "B", "C", "D"],
       "answer": "string",
       "explanation": "short explanation"
     }

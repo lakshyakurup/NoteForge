@@ -3,12 +3,15 @@ export type HistoryEntry = {
   title: string;
   mode: "quiz" | "concepts" | "revision";
   notesPreview: string;
+  /** Full notes text (may be truncated for very large pastes) */
+  notes: string;
   result: any;
   createdAt: string;
 };
 
 const STORAGE_KEY = "noteforge_history";
 const USER_KEY = "noteforge_user";
+const MAX_NOTES_CHARS = 50_000; // keep localStorage under control
 
 export function getUser(): { name: string; email?: string } | null {
   if (typeof window === "undefined") return null;
@@ -39,11 +42,22 @@ export function getHistory(): HistoryEntry[] {
   }
 }
 
-export function saveToHistory(entry: Omit<HistoryEntry, "id" | "createdAt">) {
+export function saveToHistory(
+  entry: Omit<HistoryEntry, "id" | "createdAt" | "notesPreview"> & {
+    notes: string;
+  }
+) {
   if (typeof window === "undefined") return;
   const history = getHistory();
+  const notes =
+    entry.notes.length > MAX_NOTES_CHARS
+      ? entry.notes.slice(0, MAX_NOTES_CHARS) + "\n\n…[truncated]"
+      : entry.notes;
+
   const newEntry: HistoryEntry = {
     ...entry,
+    notes,
+    notesPreview: notes.slice(0, 120),
     id: crypto.randomUUID(),
     createdAt: new Date().toISOString(),
   };

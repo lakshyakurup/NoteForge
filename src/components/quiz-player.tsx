@@ -3,8 +3,15 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { CheckCircle2, XCircle, RotateCcw, Trophy } from "lucide-react";
+import {
+  CheckCircle2,
+  XCircle,
+  RotateCcw,
+  Trophy,
+  Download,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
+import { exportQuizPdf } from "@/lib/export-pdf";
 
 export type QuizQuestion = {
   type: "mcq" | "fill" | "short";
@@ -43,7 +50,6 @@ export function QuizPlayer({ questions }: Props) {
     const user = answers[idx];
     if (!user) return false;
     const correct = questions[idx].answer;
-    // For MCQ try exact-ish match; for others allow partial
     if (questions[idx].type === "mcq") {
       return (
         normalize(user) === normalize(correct) ||
@@ -76,17 +82,28 @@ export function QuizPlayer({ questions }: Props) {
 
   return (
     <div className="space-y-4">
-      {/* Progress */}
-      <div className="flex items-center justify-between text-sm text-muted-foreground">
+      {/* Progress + export */}
+      <div className="flex items-center justify-between text-sm text-muted-foreground gap-2 flex-wrap">
         <span>
           Question {current + 1} of {total}
         </span>
-        {submitted && (
-          <span className="flex items-center gap-1 font-medium text-foreground">
-            <Trophy className="h-4 w-4 text-amber-500" />
-            Score: {score}/{total} ({Math.round((score / total) * 100)}%)
-          </span>
-        )}
+        <div className="flex items-center gap-2">
+          {submitted && (
+            <span className="flex items-center gap-1 font-medium text-foreground">
+              <Trophy className="h-4 w-4 text-amber-500" />
+              Score: {score}/{total} ({Math.round((score / total) * 100)}%)
+            </span>
+          )}
+          <Button
+            variant="outline"
+            size="sm"
+            className="gap-1.5"
+            onClick={() => exportQuizPdf(questions)}
+          >
+            <Download className="h-3.5 w-3.5" />
+            Export PDF
+          </Button>
+        </div>
       </div>
       <div className="h-2 rounded-full bg-muted overflow-hidden">
         <div
