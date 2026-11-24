@@ -1,10 +1,13 @@
 {
   "name": "noteforge",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "private": true,
   "description": "AI-powered study companion — quizzes, concept breakdowns, revision packs",
   "author": "Lakshya Kurup",
   "license": "MIT",
+  "engines": {
+    "node": ">=18.18.0"
+  },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -33,6 +36,7 @@
     "zod": "^3.24.1"
   },
   "devDependencies": {
+    "@eslint/eslintrc": "^3.2.0",
     "@types/node": "^22.10.2",
     "@types/react": "^19.0.2",
     "@types/react-dom": "^19.0.2",
@@ -44,6 +48,5 @@
     "turbo": "^2.5.4",
     "typescript": "^5.7.2",
     "vitest": "^2.1.8"
-  },
-  "packageManager": "npm@10.9.0"
+  }
 }

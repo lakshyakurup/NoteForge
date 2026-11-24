@@ -22,7 +22,9 @@ jobs:
           cache: npm
 
       - name: Install dependencies
-        run: npm ci
+        # npm install works without a committed lockfile; prefer npm ci once lock is committed
+        run: |
+          if [ -f package-lock.json ]; then npm ci; else npm install; fi
 
       - name: Lint
         run: npm run lint
@@ -36,7 +38,6 @@ jobs:
       - name: Build
         run: npm run build
         env:
-          # Build must succeed without live AI keys
           GEMINI_API_KEY: ""
           OPENAI_API_KEY: ""
           NEXT_PUBLIC_DEMO_MODE: "true"

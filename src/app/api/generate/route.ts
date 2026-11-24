@@ -7,6 +7,9 @@ import {
 import { generateBodySchema } from "@/lib/schemas";
 import { getDemoResult } from "@/lib/demo-data";
 
+export const runtime = "nodejs";
+export const maxDuration = 60; // Vercel Pro allows higher; Hobby max is 60s on newer plans
+
 export async function POST(req: NextRequest) {
   try {
     const json = await req.json();
@@ -21,7 +24,6 @@ export async function POST(req: NextRequest) {
 
     const { notes, mode } = parsed.data;
 
-    // Demo mode: no external AI calls
     if (process.env.NEXT_PUBLIC_DEMO_MODE === "true") {
       return NextResponse.json(getDemoResult(mode));
     }
@@ -38,7 +40,8 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(data);
   } catch (err: unknown) {
-    const message = err instanceof Error ? err.message : "Failed to generate content";
+    const message =
+      err instanceof Error ? err.message : "Failed to generate content";
     console.error("[NoteForge API]", message);
     return NextResponse.json({ error: message }, { status: 500 });
   }
