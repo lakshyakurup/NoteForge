@@ -14,22 +14,20 @@ const metadataBase = new URL(
 
 export const metadata: Metadata = {
   metadataBase,
-  title: "Horizon — The Global Hackathon",
+  title: "NoteForge — Turn your notes into a study superpower",
   description:
-    "One planet. A million perspectives. Join the interest list for Horizon, an international hackathon for people building a more useful future.",
-  applicationName: "Horizon Hackathon",
+    "Transform class notes into interactive quizzes, clear concept explanations, flashcards, and personalized revision materials with NoteForge.",
+  applicationName: "NoteForge",
   openGraph: {
-    title: "Horizon — The Global Hackathon",
+    title: "NoteForge — Turn your notes into a study superpower",
     description:
-      "A new international hackathon for curious builders. Dates and event details announced soon.",
+      "From lecture notes to real understanding. Create quizzes, concept breakdowns, and revision packs built around what you need to learn.",
     type: "website",
-    images: [{ url: "/hackathon-orbit.png", width: 1536, height: 1024, alt: "A luminous globe crossed by orbital light" }],
   },
   twitter: {
-    card: "summary_large_image",
-    title: "Horizon — The Global Hackathon",
-    description: "Build what’s next, together. Dates announced soon.",
-    images: ["/hackathon-orbit.png"],
+    card: "summary",
+    title: "NoteForge — Turn your notes into a study superpower",
+    description: "Create quizzes, concept explanations, and personalized revision materials from your notes.",
   },
 };
 
