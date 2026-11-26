@@ -1,5 +1,5 @@
-import { Landing } from "@/components/landing";
+import { NoteForgeLanding } from "@/components/noteforge-landing";
 
 export default function Home() {
-  return <Landing />;
+  return <NoteForgeLanding />;
 }
