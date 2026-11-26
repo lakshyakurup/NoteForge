@@ -411,7 +411,7 @@ export default function AppWorkspace() {
                   <div className="h-48 overflow-y-auto rounded-xl border border-border/60 bg-background/40 p-3 space-y-2 text-sm">
                     {chat.length === 0 && (
                       <p className="text-muted-foreground text-xs">
-                        Ask anything about your notes — "Explain the Calvin cycle simply" or "Quiz me on ATP".
+                        Ask anything about your notes — &quot;Explain the Calvin cycle simply&quot; or &quot;Quiz me on ATP&quot;.
                       </p>
                     )}
                     {chat.map((m, i) => (
