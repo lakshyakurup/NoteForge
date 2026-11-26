@@ -1,7 +1,5 @@
-import Image from "next/image";
 import {
   ArrowDown,
-  ArrowDownRight,
   ArrowRight,
   ArrowUpRight,
   BookOpenCheck,
@@ -136,9 +134,10 @@ function SiteHeader() {
 function Hero() {
   return (
     <section className="hero-section" id="top" aria-labelledby="hero-title">
+      <div className="hero-aurora" aria-hidden="true"><span /><span /><span /></div>
       <div className="hero-copy">
         <p className="eyebrow"><span className="live-dot" aria-hidden="true" /> A global build starts here</p>
-        <h1 id="hero-title">MAKE<br />WHAT&apos;S <span className="hero-highlight">NEXT.</span></h1>
+        <h1 id="hero-title">MAKE WHAT&apos;S<br /><span className="hero-highlight">NEXT.</span></h1>
         <p className="hero-lede">
           One planet. A million perspectives. A new international hackathon for people who want to make useful things for the world we share.
         </p>
@@ -152,23 +151,16 @@ function Hero() {
           <span>Dates announced soon</span>
         </div>
       </div>
-      <div className="hero-artwork">
-        <Image
-          src="/hackathon-orbit.png"
-          alt="A luminous glass globe crossed by bright orbital lines"
-          fill
-          priority
-          sizes="(max-width: 760px) 100vw, 48vw"
-          className="hero-image"
-        />
-        <div className="artwork-grain" aria-hidden="true" />
+      <div className="hero-artwork command-preview" aria-label="Preview of the Horizon hackathon challenge launcher">
         <div className="artwork-index"><span>HZN / 001</span><span>GLOBAL EDITION</span></div>
-        <div className="artwork-note">
-          <span className="artwork-note-icon"><Sparkles size={16} aria-hidden="true" /></span>
-          <span><strong>Ideas have no borders.</strong><small>Let&apos;s build like it.</small></span>
-          <ArrowDownRight className="artwork-note-arrow" size={20} aria-hidden="true" />
+        <div className="command-search"><SearchGlyph /><span>Find your challenge</span><kbd>⌘ K</kbd></div>
+        <div className="command-results">
+          <a className="command-result active" href="#tracks"><span className="command-icon"><Leaf size={16} /></span><span><strong>Climate resilience</strong><small>Design for a changing planet</small></span><kbd>↵</kbd></a>
+          <a className="command-result" href="#tracks"><span className="command-icon"><BookOpenCheck size={16} /></span><span><strong>Learning without limits</strong><small>Open knowledge to everyone</small></span><kbd>⌘ 2</kbd></a>
+          <a className="command-result" href="#tracks"><span className="command-icon"><Landmark size={16} /></span><span><strong>Civic life, reimagined</strong><small>Make public services work better</small></span><kbd>⌘ 3</kbd></a>
+          <a className="command-result" href="#tracks"><span className="command-icon"><Lightbulb size={16} /></span><span><strong>Your world, your brief</strong><small>Bring the question you care about</small></span><kbd>⌘ 4</kbd></a>
         </div>
-        <span className="artwork-coordinate" aria-hidden="true">00° 00&apos; / EVERYWHERE</span>
+        <div className="command-footer"><span>↑↓ explore <i>·</i> enter choose</span><span><Globe2 size={13} /> HORIZON</span></div>
       </div>
       <div className="hero-bottomline">
         <span>THE FUTURE IS A TEAM SPORT</span>
@@ -176,6 +168,10 @@ function Hero() {
       </div>
     </section>
   );
+}
+
+function SearchGlyph() {
+  return <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true"><circle cx="11" cy="11" r="7" /><path d="m16 16 4 4" /></svg>;
 }
 
 function SignalStrip() {
